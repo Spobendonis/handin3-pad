@@ -63,6 +63,51 @@ Main
 
 ### 3.5
 
+Done...
+
 ### 3.6
 
+```fsharp
+let compString s =
+    s |> fromString
+    |> scomp <| [];;
+```
+
 ### 3.7
+
+Below is displayed all code that was modified...
+
+**`Absyn.fs`**
+```fsharp
+type expr = 
+  | CstI of int
+  | Var of string
+  | Let of string * expr * expr
+  | If of expr * expr * expr
+  | Prim of string * expr * expr
+```
+
+**`ExprLex.fsl`**
+```fsharp
+type expr = 
+  | CstI of int
+  | Var of string
+  | Let of string * expr * expr
+  | If of expr * expr * expr
+  | Prim of string * expr * expr
+```
+
+**`ExprPar.fsy`**
+```
+Expr:
+    NAME                                { Var $1            }
+  | CSTINT                              { CstI $1           }
+  | MINUS CSTINT                        { CstI (- $2)       }
+  | LPAR Expr RPAR                      { $2                }
+  | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)   }
+  | IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)    }
+  | Expr TIMES Expr                     { Prim("*", $1, $3) }
+  | Expr PLUS  Expr                     { Prim("+", $1, $3) }  
+  | Expr MINUS Expr                     { Prim("-", $1, $3) } 
+;
+```
