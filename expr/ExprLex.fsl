@@ -34,7 +34,10 @@ rule Token = parse
   | '+'             { PLUS  } 
   | '-'             { MINUS } 
   | '*'             { TIMES }
-  | '='             { EQ    } 
+  | '='             { EQ    }
+  | 'if'            { IF    }
+  | 'then'          { then  }
+  | 'else'          { else  }
   | '('             { LPAR  } 
   | ')'             { RPAR  } 
   | eof             { EOF   }
