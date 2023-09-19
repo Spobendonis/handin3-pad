@@ -2,6 +2,8 @@
 
 ## PLC
 
+fsharpi -r FSharp.PowerPack.dll Absyn.fs ExprPar.fs ExprLex.fs Parse.fs
+
 ### 3.3
 
 ```text
@@ -68,7 +70,7 @@ type expr =
   | CstI of int
   | Var of string
   | Let of string * expr * expr
-  | If of expr * expr * expr
+  | If of expr * expr * expr    //<NEW>
   | Prim of string * expr * expr
 ```
 
@@ -79,20 +81,48 @@ type expr =
 | CstI of int
 | Var of string
 | Let of string * expr * expr
-| If of expr * expr * expr
+| If of expr * expr * expr      //<NEW>
 | Prim of string * expr * expr
+
+rule Token = parse
+  | [' ' '\t' '\r'] { Token lexbuf }
+  | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+  | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }
+  | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                    { keyword (lexemeAsString lexbuf) }
+  | '+'             { PLUS  } 
+  | '-'             { MINUS } 
+  | '*'             { TIMES }
+  | '='             { EQ    }
+  | 'if'            { IF    }       //<NEW>
+  | 'then'          { then  }       //<NEW>
+  | 'else'          { else  }       //<NEW>
+  | '('             { LPAR  } 
+  | ')'             { RPAR  } 
+  | eof             { EOF   }
+  | _               { failwith "Lexer error: illegal symbol" }
 ```
 
 **`ExprPar.fsy`**
 
 ```text
+%token <int> CSTINT
+%token <string> NAME
+%token PLUS MINUS TIMES DIVIDE EQ
+%token IF THEN ELSE                 <NEW>
+%token END IN LET
+%token LPAR RPAR
+%token EOF
+
+...
+
 Expr:
     NAME                                { Var $1            }
 | CSTINT                              { CstI $1           }
 | MINUS CSTINT                        { CstI (- $2)       }
 | LPAR Expr RPAR                      { $2                }
 | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)   }
-| IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)    }
+| IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)    }         <NEW>
 | Expr TIMES Expr                     { Prim("*", $1, $3) }
 | Expr PLUS  Expr                     { Prim("+", $1, $3) }  
 | Expr MINUS Expr                     { Prim("-", $1, $3) }
