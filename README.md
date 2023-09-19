@@ -4,6 +4,7 @@
 
 ### 3.3
 
+```text
     Write out the rightmost derivation of the string below from the expression grammar at the end of Sect. 3.6.5, corresponding to ExprPar.fsy. Take note
     of the sequence of grammar rules (A–I) used.
     ---
@@ -16,6 +17,7 @@
     | Expr TIMES Expr               rule G
     | Expr PLUS Expr                rule H
     | Expr MINUS Expr               rule I
+```
 
 `let z = (17) in z + 2 * 3 end EOF`
 
@@ -60,6 +62,7 @@ let compString s =
 Below is displayed all code that was modified...
 
 **`Absyn.fs`**
+
 ```fsharp
 type expr = 
   | CstI of int
@@ -70,6 +73,7 @@ type expr =
 ```
 
 **`ExprLex.fsl`**
+
 ```fsharp
 type expr = 
 | CstI of int
@@ -81,7 +85,7 @@ type expr =
 
 **`ExprPar.fsy`**
 
-```
+```text
 Expr:
     NAME                                { Var $1            }
 | CSTINT                              { CstI $1           }
@@ -91,7 +95,6 @@ Expr:
 | IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)    }
 | Expr TIMES Expr                     { Prim("*", $1, $3) }
 | Expr PLUS  Expr                     { Prim("+", $1, $3) }  
-| Expr MINUS Expr                     { Prim("-", $1, $3) } 
+| Expr MINUS Expr                     { Prim("-", $1, $3) }
 ;
-
 ```
